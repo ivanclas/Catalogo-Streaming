@@ -4,6 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>PERFILES DISPONIBLES</title>
+    <!-- Cargar la librería de Font Awesome para usar el icono de WhatsApp -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
     <script type="module">
         import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
         import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
@@ -183,6 +185,7 @@
         });
     </script>
     <style>
+        /* Estilos principales del catálogo y de los botones */
         body {
             font-family: Arial, sans-serif;
             background-color: #f0f0f0;
@@ -215,7 +218,7 @@
             margin-top: 10px;
         }
         #searchInput {
-            width: 100%;
+            width: 80%;
             padding: 10px;
             border: 1px solid #ddd;
             border-radius: 5px;
@@ -227,9 +230,8 @@
             gap: 20px;
             width: 100%;
             max-width: 800px;
-            margin-top: 120px; /* Para dar espacio a la cabecera fija */
+            margin-top: 120px;
         }
-
         .catalog-item {
             background: white;
             border-radius: 12px;
@@ -252,14 +254,6 @@
             padding: 15px;
             text-align: center;
         }
-        .catalog-details h3 {
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
-        .catalog-details p {
-            font-size: 16px;
-            margin-bottom: 10px;
-        }
         .add-to-cart-btn {
             background-color: #25D366;
             color: white;
@@ -272,7 +266,7 @@
         .add-to-cart-btn:hover {
             background-color: #1EBE5A;
         }
-        #cartButton {
+        #cartButton, #whatsappButton {
             position: fixed;
             bottom: 20px;
             right: 20px;
@@ -288,6 +282,10 @@
             font-size: 24px;
             cursor: pointer;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            z-index: 1000;
+        }
+        #whatsappButton {
+            bottom: 90px; /* Mueve el botón de WhatsApp un poco más arriba */
         }
         #cartButtonNotification {
             position: absolute;
@@ -407,6 +405,10 @@
     </div>
     <div id="catalogContainer"></div>
 
+    <button id="whatsappButton" onclick="window.open('https://api.whatsapp.com/send?phone=51917342838', '_blank')">
+        <i class="fab fa-whatsapp"></i>
+    </button>
+
     <button id="cartButton" onclick="window.toggleCartModal()">
         🛒
         <span id="cartButtonNotification">0</span>
@@ -423,4 +425,3 @@
     </div>
 </body>
 </html>
-
