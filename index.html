@@ -24,37 +24,42 @@
         let cart = [];
 
         async function loadCatalog(filter = '', selectedId = null) {
-            const catalogContainer = document.getElementById('catalogContainer');
-            catalogContainer.innerHTML = ''; 
+    const catalogContainer = document.getElementById('catalogContainer');
+    catalogContainer.innerHTML = ''; 
 
-            try {
-                const querySnapshot = await getDocs(collection(firestore, 'photos'));
+    try {
+        const querySnapshot = await getDocs(collection(firestore, 'photos'));
+        const displayedItems = new Set(); // Usamos un Set para guardar IDs únicos
+
+        querySnapshot.forEach((doc) => {
+            const data = doc.data();
+            const productId = doc.id;
+
+            // Si el producto ya ha sido mostrado, lo saltamos
+            if (displayedItems.has(productId)) return;
+
+            if (data.name.toLowerCase().includes(filter.toLowerCase()) || data.price.toString().includes(filter) || productId === selectedId) {
+                const item = document.createElement('div');
+                item.className = 'catalog-item';
+
+                item.innerHTML = `
+                    <img src="${data.imageUrl}" alt="${data.name}" class="catalog-image">
+                    <div class="catalog-details">
+                        <h3>${data.name}</h3>
+                        <p>Precio: S/ ${data.price}</p>
+                        <button class="add-to-cart-btn" id="add-to-cart-${productId}" onclick="window.addToCart('${productId}', '${data.name}', ${data.price}, '${data.imageUrl}', this)">Agregar al Carrito</button>
+                    </div>
+                `;
                 
-                querySnapshot.forEach((doc) => {
-                    const data = doc.data();
-                    const productId = doc.id;
-
-                    if (data.name.toLowerCase().includes(filter.toLowerCase()) || data.price.toString().includes(filter) || productId === selectedId) {
-                        const item = document.createElement('div');
-                        item.className = 'catalog-item';
-
-                        item.innerHTML = `
-                            <img src="${data.imageUrl}" alt="${data.name}" class="catalog-image">
-                            <div class="catalog-details">
-                                <h3>${data.name}</h3>
-                                <p>Precio: S/ ${data.price}</p>
-                                <button class="add-to-cart-btn" id="add-to-cart-${productId}" onclick="window.addToCart('${productId}', '${data.name}', ${data.price}, '${data.imageUrl}', this)">Agregar al Carrito</button>
-                            </div>
-                        `;
-                        
-                        catalogContainer.appendChild(item);
-                    }
-                });
-            } catch (error) {
-                console.error("Error al cargar el catálogo:", error);
-                alert("Error al cargar el catálogo. Inténtalo más tarde.");
+                catalogContainer.appendChild(item);
+                displayedItems.add(productId); // Agregamos el ID al Set para evitar duplicados
             }
-        }
+        });
+    } catch (error) {
+        console.error("Error al cargar el catálogo:", error);
+        alert("Error al cargar el catálogo. Inténtalo más tarde.");
+    }
+}
 
         function addToCart(productId, name, price, imageUrl, button) {
             const existingProduct = cart.find(item => item.id === productId);
