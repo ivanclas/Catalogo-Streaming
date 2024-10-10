@@ -9,7 +9,7 @@
         import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
 
         const firebaseConfig = {
-            apiKey: "AIzaSyD8Qixd8Q5DFYu0a5l5jiYC2ODrUbnjwuk",
+            apiKey: "AIzaSyD8Qixd8bQ5DFYu0a5l5jiYC2ODrUbnjwuk",
             authDomain: "guardar-fotos-ec316.firebaseapp.com",
             projectId: "guardar-fotos-ec316",
             storageBucket: "guardar-fotos-ec316.appspot.com",
@@ -21,45 +21,57 @@
         const app = initializeApp(firebaseConfig);
         const firestore = getFirestore(app);
 
+        let products = [];
         let cart = [];
 
-        async function loadCatalog(filter = '', selectedId = null) {
-    const catalogContainer = document.getElementById('catalogContainer');
-    catalogContainer.innerHTML = ''; 
+        async function loadCatalog() {
+            const catalogContainer = document.getElementById('catalogContainer');
+            catalogContainer.innerHTML = ''; // Limpia el contenedor al inicio
 
-    try {
-        const querySnapshot = await getDocs(collection(firestore, 'photos'));
-        const displayedItems = new Set(); // Usamos un Set para guardar IDs únicos
+            try {
+                const querySnapshot = await getDocs(collection(firestore, 'photos'));
 
-        querySnapshot.forEach((doc) => {
-            const data = doc.data();
-            const productId = doc.id;
+                products = querySnapshot.docs.map(doc => ({
+                    id: doc.id,
+                    ...doc.data()
+                }));
 
-            // Si el producto ya ha sido mostrado, lo saltamos
-            if (displayedItems.has(productId)) return;
+                renderCatalog(products);
+            } catch (error) {
+                console.error("Error al cargar el catálogo:", error);
+                alert("Error al cargar el catálogo. Inténtalo más tarde.");
+            }
+        }
 
-            if (data.name.toLowerCase().includes(filter.toLowerCase()) || data.price.toString().includes(filter) || productId === selectedId) {
+        function renderCatalog(filteredProducts) {
+            const catalogContainer = document.getElementById('catalogContainer');
+            catalogContainer.innerHTML = ''; // Limpiamos el contenedor
+
+            filteredProducts.forEach((product) => {
                 const item = document.createElement('div');
                 item.className = 'catalog-item';
 
                 item.innerHTML = `
-                    <img src="${data.imageUrl}" alt="${data.name}" class="catalog-image">
+                    <img src="${product.imageUrl}" alt="${product.name}" class="catalog-image">
                     <div class="catalog-details">
-                        <h3>${data.name}</h3>
-                        <p>Precio: S/ ${data.price}</p>
-                        <button class="add-to-cart-btn" id="add-to-cart-${productId}" onclick="window.addToCart('${productId}', '${data.name}', ${data.price}, '${data.imageUrl}', this)">Agregar al Carrito</button>
+                        <h3>${product.name}</h3>
+                        <p>Precio: S/ ${product.price}</p>
+                        <button class="add-to-cart-btn" id="add-to-cart-${product.id}" onclick="window.addToCart('${product.id}', '${product.name}', ${product.price}, '${product.imageUrl}', this)">Agregar al Carrito</button>
                     </div>
                 `;
-                
+
                 catalogContainer.appendChild(item);
-                displayedItems.add(productId); // Agregamos el ID al Set para evitar duplicados
-            }
-        });
-    } catch (error) {
-        console.error("Error al cargar el catálogo:", error);
-        alert("Error al cargar el catálogo. Inténtalo más tarde.");
-    }
-}
+            });
+        }
+
+        function handleSearch() {
+            const searchInput = document.getElementById('searchInput').value.toLowerCase();
+            const filteredProducts = products.filter(product => 
+                product.name.toLowerCase().includes(searchInput) || 
+                product.price.toString().includes(searchInput)
+            );
+            renderCatalog(filteredProducts);
+        }
 
         function addToCart(productId, name, price, imageUrl, button) {
             const existingProduct = cart.find(item => item.id === productId);
@@ -86,11 +98,6 @@
             const cartItemsContainer = document.getElementById('cartItems');
             const totalPriceElement = document.getElementById('totalPrice');
             const cartButtonNotification = document.getElementById('cartButtonNotification');
-
-            if (!cartItemsContainer || !totalPriceElement || !cartButtonNotification) {
-                console.error("Error: No se encontró el contenedor del carrito o el elemento de total.");
-                return;
-            }
 
             cartItemsContainer.innerHTML = '';
             let total = 0;
@@ -174,11 +181,6 @@
             loadCatalog();
             document.getElementById('searchInput').addEventListener('input', handleSearch);
         });
-
-        function handleSearch() {
-            const searchInput = document.getElementById('searchInput').value;
-            loadCatalog(searchInput);
-        }
     </script>
     <style>
         body {
@@ -190,17 +192,27 @@
             align-items: center;
             color: #333;
         }
+        .header {
+            width: 100%;
+            max-width: 800px;
+            position: fixed;
+            top: 0;
+            background-color: #fff;
+            z-index: 1000;
+            padding: 10px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+        }
         h1 {
             font-size: 28px;
-            margin-bottom: 20px;
             color: #4CAF50;
+            margin: 0;
+            text-align: center;
         }
         #searchContainer {
             width: 100%;
-            max-width: 600px;
-            margin-bottom: 20px;
             display: flex;
             justify-content: center;
+            margin-top: 10px;
         }
         #searchInput {
             width: 100%;
@@ -215,7 +227,9 @@
             gap: 20px;
             width: 100%;
             max-width: 800px;
+            margin-top: 120px; /* Para dar espacio a la cabecera fija */
         }
+
         .catalog-item {
             background: white;
             border-radius: 12px;
@@ -385,9 +399,11 @@
     </style>
 </head>
 <body>
-    <h1>Catálogo Streaming</h1>
-    <div id="searchContainer">
-        <input type="text" id="searchInput" placeholder="Buscar por nombre o precio...">
+    <div class="header">
+        <h1>Catálogo Streaming</h1>
+        <div id="searchContainer">
+            <input type="text" id="searchInput" placeholder="Buscar por nombre o precio...">
+        </div>
     </div>
     <div id="catalogContainer"></div>
 
@@ -407,3 +423,4 @@
     </div>
 </body>
 </html>
+
