@@ -680,7 +680,7 @@
         }
 
         function shareProduct(productId, name, price, imageUrl) {
-            const productUrl = `https://tusitio.com/catalago.html?productId=${productId}`;
+            const productUrl = `https://ivanclas.github.io/Catalogo-Streaming/index.html?productId=${productId}`;
             const message = `¡Mira este producto! 🛍️\n\nProducto: ${decodeURIComponent(name)}\nPrecio: S/ ${price}\n\nPuedes verlo aquí: ${productUrl}`;
             const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
             window.open(whatsappUrl, '_blank');
