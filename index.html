@@ -12,12 +12,18 @@
         body {
             font-family: 'Poppins', sans-serif;
             background-color: #f4f6f9;
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
             margin: 0;
             color: #333;
+        }
+
+        .header {
+            position: fixed;
+            top: 0;
+            width: 100%;
+            background-color: #f4f6f9;
+            z-index: 1000;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
         h1 {
@@ -26,14 +32,14 @@
             font-weight: 700;
             letter-spacing: 1.5px;
             text-align: center;
-            margin-bottom: 25px;
+            margin: 0 0 15px 0;
             text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
         }
 
         #searchContainer {
             width: 100%;
             max-width: 600px;
-            margin-bottom: 20px;
+            margin: 0 auto;
             display: flex;
             justify-content: center;
         }
@@ -60,7 +66,11 @@
             gap: 20px;
             width: 100%;
             max-width: 800px;
+            margin: 0 auto;
+            padding: 220px 20px 20px 20px; /* Ajustar el padding-top según la altura del header */
+            box-sizing: border-box;
         }
+
         .catalog-item {
             background: white;
             border-radius: 12px;
@@ -71,30 +81,30 @@
             flex-direction: column;
             align-items: center;
         }
+
         .catalog-item:hover {
             transform: scale(1.05);
         }
+
         .catalog-image {
             width: 100%;
             height: 150px;
             object-fit: cover;
         }
+
         .catalog-details {
             padding: 15px;
             text-align: center;
         }
+
         .catalog-details h3 {
             font-size: 18px;
-            margin-bottom: 10px;
-        }
-        .catalog-details p {
-            font-size: 16px;
             margin-bottom: 10px;
         }
 
         .catalog-details p {
             font-size: 16px;
-            margin-bottom: 15px;
+            margin-bottom: 10px;
             color: #777;
         }
 
@@ -202,6 +212,7 @@
             overflow-y: auto;
             position: relative;
             max-height: 80%;
+            text-align: center;
         }
 
         #cartModalContent {
@@ -312,100 +323,59 @@
 
         .modal-buttons {
             display: flex;
-            justify-content: space-between;
+            flex-direction: column;
+            gap: 15px;
             margin-top: 20px;
         }
 
-        .modal-buttons button {
-            flex: 1;
-            margin: 0 5px;
-            padding: 12px 20px;
-            font-size: 16px;
-            border-radius: 25px;
-            cursor: pointer;
-            border: none;
-        }
-
-        .modal-buttons .whatsapp-btn {
+        .whatsapp-btn {
             background-color: #25D366;
             color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 10px;
+            font-size: 17px;
+            cursor: pointer;
+            transition: background-color 0.3s ease, transform 0.2s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            width: 100%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .modal-buttons .whatsapp-btn:hover {
+        .whatsapp-btn:hover {
             background-color: #1EBE5A;
+            transform: scale(1.05);
         }
 
-        .modal-buttons .close-btn-modal {
+        .remove-btn {
             background-color: #ff4d4d;
             color: white;
+            border: none;
+            border-radius: 25px;
+            padding: 10px;
+            font-size: 18px;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+            width: 100%;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
-        .modal-buttons .close-btn-modal:hover {
+        .remove-btn:hover {
             background-color: #e60000;
         }
 
+        /* Estilos para la imagen del QR de Yape */
         .yape-qr {
-            width: 80%;
+            width: 100%;
+            max-width: 300px; /* Ajustamos el tamaño máximo de la imagen */
             height: auto;
             margin-top: 10px;
         }
-        #cartModalContent {
-    background: white;
-    padding: 20px;
-    border-radius: 15px;
-    width: 70%;
-    max-width: 400px;
-    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-    position: relative;
-    overflow-y: auto;
-}
 
-.modal-buttons {
-    display: flex;
-    flex-direction: column;
-    gap: 15px; 
-    margin-top: 20px;
-}
-
-.whatsapp-btn {
-    background-color: #25D366;
-    color: white;
-    border: none;
-    border-radius: 25px;
-    padding: 10px;
-    font-size: 17px;
-    cursor: pointer;
-    transition: background-color 0.3s ease, transform 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 10px;
-    width: 100%; 
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.whatsapp-btn:hover {
-    background-color: #1EBE5A;
-    transform: scale(1.05);
-}
-
-.remove-btn {
-    background-color: #ff4d4d;
-    color: white;
-    border: none;
-    border-radius: 25px;
-    padding: 10px;
-    font-size: 18px;
-    cursor: pointer;
-    transition: background-color 0.3s ease;
-    width: 100%; 
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-}
-
-.remove-btn:hover {
-    background-color: #e60000;
-}
-
+        /* Responsivo */
         @media (max-width: 600px) {
             #catalogContainer {
                 grid-template-columns: 1fr;
@@ -425,13 +395,12 @@
                 height: 45px;
                 font-size: 20px;
             }
+
+            .yape-qr {
+                max-width: 250px; /* Ajustamos el tamaño máximo en móviles */
+            }
         }
     </style>
-
-
-
-    
-
 </head>
 <body>
     <div class="header">
@@ -447,7 +416,6 @@
     </button>
 
     <button id="yapeButton" onclick="window.toggleYapeModal()">
-       
         <img src="icono.png" alt="Yape" style="width: 30px; height: 30px;">
     </button>
 
@@ -470,7 +438,7 @@
         <div class="yape-modal-content">
             <span class="close-btn" onclick="window.toggleYapeModal()">&times;</span>
             <h2>Escanea para pagar con Yape</h2>
-          
+            <!-- Ajusta la ruta a tu imagen de QR de Yape -->
             <img src="YAPE.jpeg" alt="Código QR para pagar con Yape" class="yape-qr">
         </div>
     </div>
@@ -497,7 +465,7 @@
 
         async function loadCatalog() {
             const catalogContainer = document.getElementById('catalogContainer');
-            catalogContainer.innerHTML = ''; 
+            catalogContainer.innerHTML = '';
 
             try {
                 const querySnapshot = await getDocs(collection(firestore, 'photos'));
@@ -507,20 +475,16 @@
                     ...doc.data()
                 }));
 
-          
                 const urlParams = new URLSearchParams(window.location.search);
                 const sharedProductId = urlParams.get('productId');
                 if (sharedProductId) {
                     const sharedProduct = products.find(product => product.id === sharedProductId);
                     if (sharedProduct) {
-                    
                         renderCatalog([sharedProduct]);
                     } else {
-                     
                         catalogContainer.innerHTML = '<p>Producto no encontrado.</p>';
                     }
                 } else {
-                    
                     renderCatalog(products);
                 }
             } catch (error) {
@@ -531,13 +495,12 @@
 
         function renderCatalog(filteredProducts) {
             const catalogContainer = document.getElementById('catalogContainer');
-            catalogContainer.innerHTML = ''; 
+            catalogContainer.innerHTML = '';
 
             filteredProducts.forEach((product) => {
                 const item = document.createElement('div');
                 item.className = 'catalog-item';
 
-              
                 const productIdEscaped = encodeURIComponent(product.id);
                 const productNameEscaped = encodeURIComponent(product.name);
                 const productPriceEscaped = encodeURIComponent(product.price);
@@ -559,8 +522,8 @@
 
         function handleSearch() {
             const searchInput = document.getElementById('searchInput').value.toLowerCase();
-            const filteredProducts = products.filter(product => 
-                product.name.toLowerCase().includes(searchInput) || 
+            const filteredProducts = products.filter(product =>
+                product.name.toLowerCase().includes(searchInput) ||
                 product.price.toString().includes(searchInput)
             );
             renderCatalog(filteredProducts);
@@ -671,7 +634,7 @@
             const totalPrice = document.getElementById('totalPrice').textContent;
             message += `\n\n${totalPrice}`;
 
-     
+            // Incluir imágenes en el mensaje
             const imageUrls = cart.map(item => item.imageUrl);
             const imagesText = imageUrls.map(url => `\n${url}`).join('');
 
@@ -686,7 +649,7 @@
             window.open(whatsappUrl, '_blank');
         }
 
-       
+        // Cerrar el modal al hacer clic fuera del contenido del modal
         window.addEventListener('click', function(event) {
             const yapeModal = document.getElementById('yapeModal');
             const cartModal = document.getElementById('cartModal');
