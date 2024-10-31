@@ -634,9 +634,10 @@
             const totalPrice = document.getElementById('totalPrice').textContent;
             message += `\n\n${totalPrice}`;
 
-           
+            // Incluir imágenes en el mensaje
+          
 
-            const whatsappUrl = `https://api.whatsapp.com/send?phone=51917342838&text=${encodeURIComponent(message + imagesText)}`;
+            const whatsappUrl = `https://api.whatsapp.com/send?phone=51917342838&text=${encodeURIComponent(message)}`;
             window.open(whatsappUrl, '_blank');
         }
 
