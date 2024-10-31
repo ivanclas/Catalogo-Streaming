@@ -634,9 +634,7 @@
             const totalPrice = document.getElementById('totalPrice').textContent;
             message += `\n\n${totalPrice}`;
 
-            // Incluir imágenes en el mensaje
-            const imageUrls = cart.map(item => item.imageUrl);
-            const imagesText = imageUrls.map(url => `\n${url}`).join('');
+           
 
             const whatsappUrl = `https://api.whatsapp.com/send?phone=51917342838&text=${encodeURIComponent(message + imagesText)}`;
             window.open(whatsappUrl, '_blank');
