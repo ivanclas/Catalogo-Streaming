@@ -180,6 +180,24 @@
       return `${d}-${m}-${y}`;
     }
 
+    // Calcula los días restantes
+    function daysRemaining(date) {
+      const today = new Date();
+      const endDate = new Date(date);
+      const timeDiff = endDate - today;
+      return Math.ceil(timeDiff / (1000 * 3600 * 24));
+    }
+
+    // Muestra notificación si está cerca de vencer o ya venció
+    function showNotification(message) {
+      if (Notification.permission === "granted") {
+        new Notification(message, {
+          body: "Revisa los detalles en el sistema.",
+          icon: "notification.png"
+        });
+      }
+    }
+
     async function loadUsers() {
       const userGallery = document.getElementById("userGallery");
       userGallery.innerHTML = "";
@@ -194,10 +212,21 @@
           const endDate = new Date(u.endDate);
           endDate.setHours(0,0,0,0);
 
+          // Calcular los días restantes
+          const remainingDays = daysRemaining(u.endDate);
+          const isExpired = remainingDays < 0;
+          const isNearExpiry = remainingDays <= 3 && remainingDays >= 0;
+
+          if (isExpired) {
+            showNotification(`El perfil de ${u.name} ha vencido.`);
+          } else if (isNearExpiry) {
+            showNotification(`El perfil de ${u.name} está por vencer en ${remainingDays} días.`);
+          }
+
           // Crear tarjeta
           const card = document.createElement("div");
           card.className = "user-card";
-          if (endDate < today) card.classList.add("expired");
+          if (isExpired) card.classList.add("expired");
 
           card.innerHTML = `
             <div class="icon"><i class="fas fa-user-alt"></i></div>
@@ -208,6 +237,7 @@
               <p>Corte: ${formatDMY(u.endDate)}</p>
               <p>Cuenta: ${u.accountName}</p>
               <p>PIN: ${u.pin}</p>
+              <p>Restantes: ${remainingDays >= 0 ? remainingDays : "Vencido"}</p>
             </div>
             <div class="actions">
               <a class="btn" href="perfil.html?id=${doc.id}">Ver Perfil</a>
