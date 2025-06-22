@@ -1,8 +1,8 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
   <title>Usuarios Registrados</title>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
   <style>
@@ -25,15 +25,11 @@
       color: #27ae60;
       margin-bottom: 1.5rem;
     }
-
-    /* Grid fluido */
     .user-gallery {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
       gap: 1.5rem;
     }
-
-    /* Tarjeta mejorada */
     .user-card {
       background: #fff;
       border-radius: 1rem;
@@ -51,7 +47,6 @@
       border: 2px solid #e74c3c;
       background: #fdecea;
     }
-
     .user-card .icon {
       background: linear-gradient(135deg, #27ae60 0%, #2ecc71 100%);
       padding: 2rem 0;
@@ -64,7 +59,6 @@
       color: #fff;
       font-size: 3rem;
     }
-
     .user-card .info {
       padding: 1.5rem;
       flex-grow: 1;
@@ -80,10 +74,8 @@
     .user-card .info p {
       font-size: .95rem;
       color: #555;
-      flex-grow: 1;
       word-wrap: break-word;
     }
-
     .user-card .actions {
       padding: 1rem 1.5rem 2rem;
       display: flex;
@@ -97,9 +89,8 @@
       border-radius: .75rem;
       font-size: .95rem;
       cursor: pointer;
-      transition: background .3s;
       text-decoration: none;
-      text-align: center;
+      transition: background .3s;
     }
     .user-card.expired .actions .btn {
       background: #c0392b;
@@ -110,8 +101,6 @@
     .user-card.expired .actions .btn:hover {
       background: #a93226;
     }
-
-    /* Botón flotante */
     .back-button {
       position: fixed;
       bottom: 1.5rem;
@@ -135,8 +124,6 @@
       background: #d35400;
       transform: translateY(-2px);
     }
-
-    /* Responsivo */
     @media (max-width:600px) {
       h1 { font-size: 2rem; }
       .user-card .info h3 { font-size: 1.2rem; }
@@ -167,67 +154,58 @@
       storageBucket: "guardar-fotos-ec316.appspot.com",
       messagingSenderId: "529201655026",
       appId: "1:529201655026:web:f10e873d825a72b5d8b46b",
-      measurementId: "G-SMEHYGBPRR"
     };
 
     // Inicializar Firebase
     const app = initializeApp(firebaseConfig);
     const firestore = getFirestore(app);
 
-    // Formatea fecha ISO a DD-MM-YYYY
+    // Formatea ISO a DD-MM-YYYY
     function formatDMY(iso) {
       const [y,m,d] = iso.split("-");
       return `${d}-${m}-${y}`;
     }
 
-    // Calcula los días restantes
-    function daysRemaining(date) {
+    // Calcula días restantes normalizando a medianoche
+    function daysRemaining(dateStr) {
       const today = new Date();
-      const endDate = new Date(date);
-      const timeDiff = endDate - today;
-      return Math.ceil(timeDiff / (1000 * 3600 * 24));
+      today.setHours(0,0,0,0);
+      const end = new Date(dateStr);
+      end.setHours(0,0,0,0);
+      return Math.ceil((end - today) / (1000*60*60*24));
     }
 
-    // Muestra notificación si está cerca de vencer o ya venció
-    function showNotification(message) {
+    // Muestra notificación (solo si hay permiso)
+    function showNotification(text) {
       if (Notification.permission === "granted") {
-        new Notification(message, {
-          body: "Revisa los detalles en el sistema.",
-          icon: "notification.png"
-        });
+        new Notification(text, { body: "Revisa los detalles en el sistema." });
       }
     }
 
+    // Pide permiso apenas carga la página
+    if ("Notification" in window) {
+      Notification.requestPermission();
+    }
+
+    // Carga y renderiza usuarios
     async function loadUsers() {
-      const userGallery = document.getElementById("userGallery");
-      userGallery.innerHTML = "";
-
-      const today = new Date();
-      today.setHours(0,0,0,0);
-
+      const gallery = document.getElementById("userGallery");
+      gallery.innerHTML = "";
       try {
-        const snapshot = await getDocs(collection(firestore, "users"));
-        snapshot.forEach(doc => {
+        const snap = await getDocs(collection(firestore, "users"));
+        snap.forEach(doc => {
           const u = doc.data();
-          const endDate = new Date(u.endDate);
-          endDate.setHours(0,0,0,0);
-
-          // Calcular los días restantes
-          const remainingDays = daysRemaining(u.endDate);
-          const isExpired = remainingDays < 0;
-          const isNearExpiry = remainingDays <= 3 && remainingDays >= 0;
-
-          if (isExpired) {
+          const rem = daysRemaining(u.endDate);
+          const expired = rem < 0;
+          // Notificaciones
+          if (expired) {
             showNotification(`El perfil de ${u.name} ha vencido.`);
-          } else if (isNearExpiry) {
-            showNotification(`El perfil de ${u.name} está por vencer en ${remainingDays} días.`);
+          } else if (rem <= 3) {
+            showNotification(`El perfil de ${u.name} está por vencer en ${rem} días.`);
           }
-
-          // Crear tarjeta
+          // Tarjeta
           const card = document.createElement("div");
-          card.className = "user-card";
-          if (isExpired) card.classList.add("expired");
-
+          card.className = "user-card" + (expired ? " expired" : "");
           card.innerHTML = `
             <div class="icon"><i class="fas fa-user-alt"></i></div>
             <div class="info">
@@ -237,17 +215,17 @@
               <p>Corte: ${formatDMY(u.endDate)}</p>
               <p>Cuenta: ${u.accountName}</p>
               <p>PIN: ${u.pin}</p>
-              <p>Restantes: ${remainingDays >= 0 ? remainingDays : "Vencido"}</p>
+              <p>Restantes: ${rem >= 0 ? rem : "Vencido"}</p>
             </div>
             <div class="actions">
               <a class="btn" href="perfil.html?id=${doc.id}">Ver Perfil</a>
             </div>
           `;
-          userGallery.appendChild(card);
+          gallery.appendChild(card);
         });
-      } catch (e) {
-        console.error("Error cargando usuarios:", e);
-        alert("No se pudieron cargar los usuarios.");
+      } catch (err) {
+        console.error("Error cargando usuarios:", err);
+        alert("Hay un problema de red o permisos al cargar los usuarios.");
       }
     }
 
