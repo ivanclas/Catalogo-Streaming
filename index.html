@@ -1,714 +1,395 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Catálogo de Productos</title>
-   
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css">
-    <style>
-        body {
-            font-family: 'Poppins', sans-serif;
-            background-color: #f4f6f9;
-            margin: 0;
-            color: #333;
-        }
+  <meta charset="UTF-8"/>
+  <meta name="viewport" content="width=device-width, initial-scale=1"/>
+  <title>Catálogo Streaming</title>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
+  <style>
+    /* ===== Reset & Base ===== */
+    *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
+    html { font-size: 16px; }
+    body { font-family:'Poppins',sans-serif; background:#f4f6f9; color:#333; line-height:1.4; }
 
-        .header {
-            position: fixed;
-            top: 0;
-            width: 100%;
-            background-color: #f4f6f9;
-            z-index: 1000;
-            padding: 20px;
-            box-sizing: border-box;
-        }
-
-        h1 {
-            font-size: 32px;
-            color: #4CAF50;
-            font-weight: 700;
-            letter-spacing: 1.5px;
-            text-align: center;
-            margin: 0 0 15px 0;
-            text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.1);
-        }
-
-        #searchContainer {
-            width: 100%;
-            max-width: 600px;
-            margin: 0 auto;
-            display: flex;
-            justify-content: center;
-        }
-
-        #searchInput {
-            width: 100%;
-            padding: 15px;
-            border: 1px solid #ddd;
-            border-radius: 30px;
-            font-size: 16px;
-            box-shadow: inset 0 2px 5px rgba(0, 0, 0, 0.1);
-            transition: all 0.3s ease;
-        }
-
-        #searchInput:focus {
-            border-color: #4CAF50;
-            outline: none;
-            box-shadow: inset 0 0 8px rgba(76, 175, 80, 0.5);
-        }
-
-        #catalogContainer {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-            gap: 20px;
-            width: 100%;
-            max-width: 800px;
-            margin: 0 auto;
-            padding: 220px 20px 20px 20px; /* Ajustar el padding-top según la altura del header */
-            box-sizing: border-box;
-        }
-
-        .catalog-item {
-            background: white;
-            border-radius: 12px;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-            overflow: hidden;
-            transition: transform 0.2s;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-        }
-
-        .catalog-item:hover {
-            transform: scale(1.05);
-        }
-
-        .catalog-image {
-            width: 100%;
-            height: 150px;
-            object-fit: cover;
-        }
-
-        .catalog-details {
-            padding: 15px;
-            text-align: center;
-        }
-
-        .catalog-details h3 {
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
-
-        .catalog-details p {
-            font-size: 16px;
-            margin-bottom: 10px;
-            color: #777;
-        }
-
-        .add-to-cart-btn, .share-btn {
-            background-color: #25D366;
-            color: white;
-            border: none;
-            border-radius: 25px;
-            padding: 12px 20px;
-            cursor: pointer;
-            transition: background-color 0.2s ease, transform 0.1s ease;
-            font-size: 16px;
-            width: 90%;
-            margin-top: 10px;
-        }
-
-        .add-to-cart-btn:hover, .share-btn:hover {
-            background-color: #1EBE5A;
-            transform: scale(1.02);
-        }
-
-        .share-btn {
-            background-color: #128C7E;
-        }
-
-        .share-btn:hover {
-            background-color: #0C7A6C;
-        }
-
-        /* Botones flotantes */
-        #cartButton, #whatsappButton, #yapeButton, #userButton {
-            position: fixed;
-            bottom: 20px;
-            right: 20px;
-            background-color: #4CAF50;
-            color: white;
-            border: none;
-            border-radius: 50%;
-            width: 55px;
-            height: 55px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 22px;
-            cursor: pointer;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-            transition: transform 0.3s ease;
-            z-index: 100;
-        }
-
-        #cartButton:hover, #whatsappButton:hover, #yapeButton:hover, #userButton:hover {
-            transform: scale(1.1);
-        }
-
-        #whatsappButton {
-            bottom: 85px;
-            background-color: #128C7E;
-        }
-
-        #yapeButton {
-            bottom: 150px;
-            background-color: #1A73E8;
-        }
-
-        #userButton {
-            bottom: 220px;
-            background-color: #1A73E8;
-        }
-
-        #cartButtonNotification {
-            position: absolute;
-            top: -5px;
-            right: -5px;
-            background-color: red;
-            color: white;
-            border-radius: 50%;
-            width: 20px;
-            height: 20px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 12px;
-        }
-
-        /* Modales */
-        #cartModal, #yapeModal {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.6);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            z-index: 1000;
-        }
-
-        #cartModal.show, #yapeModal.show {
-            display: flex;
-        }
-
-        #cartModalContent, .yape-modal-content {
-            background: white;
-            padding: 20px;
-            border-radius: 15px;
-            width: 85%;
-            max-width: 400px;
-            box-shadow: 0 8px 20px rgba(0, 0, 0, 0.2);
-            overflow-y: auto;
-            position: relative;
-            max-height: 80%;
-            text-align: center;
-        }
-
-        #cartModalContent {
-            text-align: left;
-        }
-
-        .close-btn {
-            position: absolute;
-            top: 10px;
-            right: 10px;
-            font-size: 24px;
-            cursor: pointer;
-            color: #777;
-        }
-
-        .close-btn:hover {
-            color: #000;
-        }
-
-        /* Estilos del carrito */
-        .cart-item {
-            display: flex;
-            align-items: center;
-            gap: 15px;
-            padding: 15px;
-            border-bottom: 1px solid #ddd;
-        }
-
-        .cart-item:last-child {
-            border-bottom: none;
-        }
-
-        .cart-image {
-            width: 70px;
-            height: 70px;
-            border-radius: 10px;
-            object-fit: cover;
-            box-shadow: 0 1px 4px rgba(0, 0, 0, 0.1);
-        }
-
-        .cart-details {
-            flex: 1;
-            display: flex;
-            flex-direction: column;
-            justify-content: center;
-        }
-
-        .cart-details h4 {
-            font-size: 18px;
-            margin: 0;
-            color: #333;
-        }
-
-        .cart-details p {
-            font-size: 16px;
-            margin: 5px 0;
-            color: #777;
-        }
-
-        .quantity-controls {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin-top: 5px;
-        }
-
-        .quantity-btn {
-            background-color: #007bff;
-            border: none;
-            color: white;
-            border-radius: 50%;
-            width: 35px;
-            height: 35px;
-            font-size: 18px;
-            cursor: pointer;
-        }
-
-        .quantity-btn:hover {
-            background-color: #0056b3;
-        }
-
-        .remove-btn {
-            background-color: #ff4d4d;
-            border: none;
-            color: white;
-            border-radius: 8px;
-            padding: 8px 15px;
-            cursor: pointer;
-            margin-top: 10px;
-        }
-
-        .remove-btn:hover {
-            background-color: #e60000;
-        }
-
-        #totalPrice {
-            margin-top: 15px;
-            font-size: 20px;
-            font-weight: bold;
-            text-align: right;
-        }
-
-        #cartModalContent h2 {
-            font-size: 24px;
-            margin-bottom: 15px;
-            text-align: center;
-        }
-
-        .modal-buttons {
-            display: flex;
-            flex-direction: column;
-            gap: 15px;
-            margin-top: 20px;
-        }
-
-        .whatsapp-btn {
-            background-color: #25D366;
-            color: white;
-            border: none;
-            border-radius: 25px;
-            padding: 10px;
-            font-size: 17px;
-            cursor: pointer;
-            transition: background-color 0.3s ease, transform 0.2s ease;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 10px;
-            width: 100%;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .whatsapp-btn:hover {
-            background-color: #1EBE5A;
-            transform: scale(1.05);
-        }
-
-        .remove-btn {
-            background-color: #ff4d4d;
-            color: white;
-            border: none;
-            border-radius: 25px;
-            padding: 10px;
-            font-size: 18px;
-            cursor: pointer;
-            transition: background-color 0.3s ease;
-            width: 100%;
-            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
-        }
-
-        .remove-btn:hover {
-            background-color: #e60000;
-        }
-
-        /* Estilos para la imagen del QR de Yape */
-        .yape-qr {
-            width: 100%;
-            max-width: 300px; /* Ajustamos el tamaño máximo de la imagen */
-            height: auto;
-            margin-top: 10px;
-        }
-
-        /* Responsivo */
-        @media (max-width: 600px) {
-            #catalogContainer {
-                grid-template-columns: 1fr;
-            }
-
-            #cartModalContent, .yape-modal-content {
-                width: 90%;
-            }
-
-            .cart-image {
-                width: 60px;
-                height: 60px;
-            }
-
-            #cartButton, #whatsappButton, #yapeButton, #userButton {
-                width: 45px;
-                height: 45px;
-                font-size: 20px;
-            }
-
-            .yape-qr {
-                max-width: 250px; /* Ajustamos el tamaño máximo en móviles */
-            }
-        }
-    </style>
-
-    <style>
-    #userButton {
-        position: fixed;
-        bottom: 220px;
-        right: 20px;
-        background-color: #1A73E8;
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 55px;
-        height: 55px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-size: 22px;
-        cursor: pointer;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.2);
-        transition: transform 0.3s ease;
-        z-index: 100;
+    /* ===== Header ===== */
+    .header {
+      position:fixed; top:0; left:0; width:100%;
+      background:#fff; padding:1.2rem 5%;
+      display:flex; flex-wrap:wrap; align-items:center; gap:1rem;
+      box-shadow:0 2px 6px rgba(0,0,0,0.1); z-index:1000;
+    }
+    .auth-btn {
+      display:flex; align-items:center; gap:.5rem;
+      background:#fff; border:1px solid #ddd; border-radius:30px;
+      padding:.6rem 1rem; font-size:.9rem;
+      cursor:pointer; transition:background .2s;
+    }
+    .auth-btn i { font-size:1.2rem; color:#DB4437 }
+    .auth-btn:hover { background:#f0f0f0; }
+    #searchContainer { flex:1; min-width:160px; }
+    #searchInput {
+      width:100%; padding:.6rem 1rem;
+      border:1px solid #ddd; border-radius:30px;
+      font-size:1rem;
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
+    }
+    .header h1 {
+      flex:none; font-size:1.5rem; color:#4CAF50; font-weight:600;
+      margin:0 auto;
     }
 
-    #userButton:hover {
-        transform: scale(1.1);
+    /* ===== Catálogo ===== */
+    #catalogContainer {
+      margin-top:8.5rem;
+      padding:1rem 5%;
+      display:grid; gap:1rem;
+      grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
     }
-</style>
+    .catalog-item {
+      background:#fff; border-radius:12px; overflow:hidden;
+      box-shadow:0 4px 12px rgba(0,0,0,0.08);
+      display:flex; flex-direction:column; transition:transform .2s;
+    }
+    .catalog-item:hover { transform:scale(1.025); }
+    .catalog-image {
+      width:100%; height:150px; object-fit:cover;
+    }
+    .catalog-details {
+      padding:1rem; flex:1; text-align:center;
+    }
+    .catalog-details h3 { font-size:1.1rem; margin-bottom:.5rem; }
+    .catalog-details p { font-size:.95rem; color:#555; margin-bottom:.75rem; }
+    .catalog-details button {
+      width:80%; margin:.5rem auto 0; padding:.6rem;
+      border:none; border-radius:20px; font-size:.95rem;
+      cursor:pointer; transition:background .2s;
+    }
+    .add-to-cart-btn { background:#25D366; color:#fff; }
+    .add-to-cart-btn.added { background:#e74c3c !important; }
+    .add-to-cart-btn:hover { background:#1EBE5A; }
+    .share-btn       { background:#128C7E; color:#fff; }
+    .share-btn:hover { background:#0C7A6C; }
 
+    /* ===== Floating Action Buttons ===== */
+    .fabtn {
+      position:fixed; right:1rem; width:3.5rem; height:3.5rem;
+      border:none; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      font-size:1.25rem; color:#fff;
+      box-shadow:0 4px 10px rgba(0,0,0,0.2); cursor:pointer;
+      transition:transform .2s; z-index:100;
+    }
+    /* ahora el carrito queda abajo */
+    #cartButton     { bottom:1rem; background:#4CAF50; }
+    #yapeButton     { bottom:6rem; background:#1A73E8; }
+    #whatsappButton { bottom:11rem; background:#128C7E; }
+    #userButton     { bottom:17rem; background:#6C63FF; }
+    .fabtn:hover    { transform:scale(1.1); }
+    #cartNotif {
+      position:absolute; top:-0.25rem; right:-0.25rem;
+      background:red; width:1.25rem; height:1.25rem; border-radius:50%;
+      color:#fff; font-size:.75rem; display:flex; align-items:center; justify-content:center;
+    }
+
+    /* ===== Modales ===== */
+    .modal {
+      position:fixed; inset:0; background:rgba(0,0,0,.5);
+      display:none; align-items:center; justify-content:center;
+      z-index:1000; padding:1rem;
+    }
+    .modal.show { display:flex; }
+    .modal-content {
+      background:#fff; border-radius:12px; padding:1rem;
+      width:100%; max-width:360px; position:relative;
+      max-height:90vh; display:flex; flex-direction:column;
+      box-shadow:0 8px 20px rgba(0,0,0,0.2);
+    }
+    .close-btn {
+      position:absolute; top:.5rem; right:.5rem;
+      font-size:1.25rem; cursor:pointer;
+    }
+    .modal-header { margin-bottom:.5rem; }
+
+    /* ==== Carrito estilo tarjeta + scroll ==== */
+    .cart-list {
+      flex:1; overflow-y:auto; max-height:260px;
+      display:flex; flex-direction:column; gap:1rem;
+      margin-bottom:.5rem;
+    }
+    .cart-item {
+      display:flex; align-items:center; gap:1rem;
+      background:#fff; border-radius:12px; padding:.75rem;
+      box-shadow:0 4px 12px rgba(0,0,0,0.08);
+    }
+    .cart-item img {
+      width:48px; height:48px; border-radius:8px; object-fit:cover;
+    }
+    .cart-item .cart-details {
+      flex:1; display:flex; flex-direction:column; gap:.25rem;
+    }
+    .cart-item .cart-details h4 { font-size:1rem; margin:0; }
+    .cart-item .cart-details p { font-size:.9rem; color:#555; margin:0; }
+    .cart-item .quantity-controls {
+      display:flex; align-items:center; gap:.5rem; margin-top:.5rem;
+    }
+    .cart-item .quantity-controls button {
+      width:24px; height:24px; border:none;
+      background:#3498db; color:#fff; border-radius:50%;
+      display:flex; align-items:center; justify-content:center;
+      cursor:pointer;
+    }
+    .cart-item .quantity-controls button:hover { background:#2980b9; }
+    .cart-item .rm-btn {
+      background:#e74c3c; color:#fff; border:none;
+      border-radius:20px; padding:.5rem .75rem;
+      font-size:.9rem; cursor:pointer; align-self:start;
+    }
+    .cart-item .rm-btn:hover { background:#c0392b; }
+
+    .cart-total {
+      font-size:1.1rem; font-weight:600; text-align:right;
+      margin-bottom:.5rem;
+    }
+    .modal-buttons {
+      display:flex; flex-direction:column; gap:.5rem;
+    }
+    .wh-btn, .rm-btn {
+      padding:.6rem; border:none; border-radius:25px;
+      font-size:.95rem; cursor:pointer;
+    }
+    .wh-btn { background:#25D366; color:#fff; }
+    .wh-btn:hover { background:#1EBE5A; }
+    .rm-btn { background:#ff4d4d; color:#fff; }
+    .rm-btn:hover { background:#e60000; }
+
+    /* ==== Modal Yape ==== */
+    .yape-qr { width:80%; margin:1rem auto; }
+
+    /* ===== Responsive ===== */
+    @media (max-width:500px){
+      .header{flex-direction:column;align-items:flex-start;}
+      .header h1{width:100%;text-align:center;font-size:1.25rem;}
+      #searchContainer,.auth-btn{width:100%;}
+      #catalogContainer{grid-template-columns:1fr;margin-top:9rem;}
+      .fabtn{width:3rem;height:3rem;font-size:1rem;}
+      .modal-content{width:95%;padding:.75rem;}
+      .yape-qr{width:90%;}
+    }
+  </style>
 </head>
 <body>
-    <div class="header">
-        <h1>Catálogo Streaming</h1>
-        <div id="searchContainer">
-            <input type="text" id="searchInput" placeholder="Buscar por nombre o precio...">
-        </div>
-    </div>
-    <div id="catalogContainer"></div>
 
-    <button id="whatsappButton" onclick="window.open('https://api.whatsapp.com/send?phone=51917342838', '_blank')">
-        <i class="fab fa-whatsapp"></i>
+  <header class="header">
+    <button class="auth-btn" id="btnGoogle">
+      <i class="fab fa-google"></i>
+      <span id="authText">Iniciar con Google</span>
     </button>
-
-    <button id="yapeButton" onclick="window.toggleYapeModal()">
-        <img src="icono.png" alt="Yape" style="width: 30px; height: 30px;">
-    </button>
-
-    <button id="cartButton" onclick="window.toggleCartModal()">
-        🛒
-        <span id="cartButtonNotification">0</span>
-    </button>
-
-    <!-- Botón de Usuario flotante -->
-    <button id="userButton" onclick="window.location.href='usuarios.html'">
-    <i class="fas fa-user-circle" style="font-size: 28px;"></i>
-</button>
-
-
-    <div id="cartModal">
-        <div id="cartModalContent">
-            <h2>Carrito de Compras</h2>
-            <div id="cartItems"></div>
-            <p id="totalPrice">Total: S/ 0.00</p>
-            <button class="whatsapp-btn" onclick="window.sendOrderViaWhatsApp()">Pedir por WhatsApp</button>
-            <button class="remove-btn" onclick="window.toggleCartModal()">Cerrar</button>
-        </div>
+    <h1>Catálogo Streaming</h1>
+    <div id="searchContainer">
+      <input type="text" id="searchInput" placeholder="Buscar nombre o precio…"/>
     </div>
+  </header>
 
-    <div id="yapeModal">
-        <div class="yape-modal-content">
-            <span class="close-btn" onclick="window.toggleYapeModal()">&times;</span>
-            <h2>Escanea para pagar con Yape</h2>
-            <img src="YAPE.jpeg" alt="Código QR para pagar con Yape" class="yape-qr">
-        </div>
+  <div id="catalogContainer"></div>
+
+  <!-- Floating action buttons -->
+  <button class="fabtn" id="cartButton" onclick="toggleCart()">🛒
+    <span id="cartNotif">0</span>
+  </button>
+  <button class="fabtn" id="yapeButton" onclick="toggleYape()">
+    <img src="icono.png" alt="Yape" style="width:24px;height:24px;"/>
+  </button>
+  <button class="fabtn" id="whatsappButton"
+          onclick="window.open('https://api.whatsapp.com/send?phone=51917342838','_blank')">
+    <i class="fab fa-whatsapp"></i>
+  </button>
+  <button class="fabtn" id="userButton" onclick="location.href='usuarios.html'">
+    <i class="fas fa-user"></i>
+  </button>
+
+  <!-- Cart Modal -->
+  <div class="modal" id="cartModal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="toggleCart()">&times;</span>
+      <div class="modal-header"><h2>Carrito de Compras</h2></div>
+      <div id="cartItems" class="cart-list"></div>
+      <p class="cart-total">Total: <span id="totalPrice">S/ 0.00</span></p>
+      <div class="modal-buttons">
+        <button class="wh-btn" onclick="sendOrder()">Pedir por WhatsApp</button>
+        <button class="rm-btn" onclick="toggleCart()">Cerrar</button>
+      </div>
     </div>
-    <script type="module">
-        import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
-        import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+  </div>
 
-        const firebaseConfig = {
-            apiKey: "AIzaSyD8Qixd8Q5DFYu0a5l5jiYC2ODrUbnjwuk",
-            authDomain: "guardar-fotos-ec316.firebaseapp.com",
-            projectId: "guardar-fotos-ec316",
-            storageBucket: "guardar-fotos-ec316.appspot.com",
-            messagingSenderId: "529201655026",
-            appId: "1:529201655026:web:f10e873d825a72b5d8b46b",
-            measurementId: "G-SMEHYGBPRR"
+  <!-- Yape Modal -->
+  <div class="modal" id="yapeModal">
+    <div class="modal-content">
+      <span class="close-btn" onclick="toggleYape()">&times;</span>
+      <h2>Pagar con Yape</h2>
+      <img src="YAPE.jpeg" alt="Yape QR" class="yape-qr"/>
+    </div>
+  </div>
+
+  <script type="module">
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
+    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+    import {
+      getAuth, GoogleAuthProvider,
+      signInWithPopup, onAuthStateChanged
+    } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
+
+    // Firebase config
+    const cfg = {
+      apiKey: "AIzaSyD8Qixd8Q5DFYu0a5l5jiYC2ODrUbnjwuk",
+      authDomain: "guardar-fotos-ec316.firebaseapp.com",
+      projectId: "guardar-fotos-ec316",
+      storageBucket: "guardar-fotos-ec316.appspot.com",
+      messagingSenderId: "529201655026",
+      appId: "1:529201655026:web:f10e873d825a72b5d8b46b"
+    };
+    const app  = initializeApp(cfg),
+          db   = getFirestore(app),
+          auth = getAuth(app),
+          provider = new GoogleAuthProvider();
+
+    let products = [], cart = [];
+
+    // UI elements
+    const btnG     = document.getElementById('btnGoogle'),
+          authText = document.getElementById('authText'),
+          notif    = document.getElementById('cartNotif'),
+          catC     = document.getElementById('catalogContainer'),
+          cItems   = document.getElementById('cartItems');
+
+    // Google Sign-In
+    btnG.onclick = () => signInWithPopup(auth, provider);
+    onAuthStateChanged(auth, user => {
+      authText.textContent = user ? 'Cerrar sesión' : 'Iniciar con Google';
+      loadCart();
+    });
+
+    // Load catalog
+    async function loadCatalog() {
+      catC.innerHTML = '';
+      try {
+        const snap = await getDocs(collection(db,'photos'));
+        products = snap.docs.map(d=>{
+          const data = d.data();
+          return { id:d.id, ...data, price: Number(data.price) };
+        });
+        renderCatalog(products);
+      } catch {
+        catC.innerHTML = `<p style="padding:2rem; text-align:center;">
+          Error al cargar catálogo.</p>`;
+      }
+    }
+    function renderCatalog(list) {
+      catC.innerHTML = '';
+      list.forEach(p => {
+        const d = document.createElement('div');
+        d.className = 'catalog-item';
+        d.innerHTML = `
+          <img src="${p.imageUrl}" class="catalog-image" alt="${p.name}"/>
+          <div class="catalog-details">
+            <h3>${p.name}</h3>
+            <p>Precio: S/ ${p.price}</p>
+            <button class="add-to-cart-btn">Agregar</button>
+            <button class="share-btn"><i class="fas fa-share-alt"></i></button>
+          </div>`;
+        catC.appendChild(d);
+        const btn = d.querySelector('.add-to-cart-btn');
+        btn.onclick = () => {
+          addToCart(p);
+          btn.textContent = 'Agregado';
+          btn.classList.add('added');
+          btn.disabled = true;
+          setTimeout(()=>{
+            btn.textContent = 'Agregar';
+            btn.classList.remove('added');
+            btn.disabled = false;
+          }, 1500);
         };
+        d.querySelector('.share-btn').onclick = ()=>shareProduct(p);
+      });
+    }
+    document.getElementById('searchInput').oninput = e => {
+      const term = e.target.value.toLowerCase();
+      renderCatalog(products.filter(p=>
+        p.name.toLowerCase().includes(term) ||
+        p.price.toString().includes(term)
+      ));
+    };
 
-        const app = initializeApp(firebaseConfig);
-        const firestore = getFirestore(app);
+    // Cart logic: per-user or guest
+    const cartKey = () => 'cart_' + (auth.currentUser?.uid||'guest');
+    function loadCart(){
+      cart = JSON.parse(localStorage.getItem(cartKey()))||[];
+      updateCartUI();
+    }
+    function saveCart(){
+      localStorage.setItem(cartKey(), JSON.stringify(cart));
+      updateCartUI();
+    }
+    function addToCart(p){
+      const ex = cart.find(x=>x.id===p.id);
+      ex ? ex.qty++ : cart.push({...p, qty:1});
+      saveCart();
+    }
+    function updateCartUI(){
+      cItems.innerHTML = ''; let total=0, cnt=0;
+      cart.forEach((i,idx)=>{
+        cnt += i.qty;
+        const price = i.qty>=2? i.price*0.9 : i.price;
+        total += price * i.qty;
+        const div = document.createElement('div');
+        div.className = 'cart-item';
+        div.innerHTML = `
+          <img src="${i.imageUrl}" alt="${i.name}"/>
+          <div class="cart-details">
+            <h4>${i.name}</h4>
+            <p>S/ ${price.toFixed(2)}</p>
+            <div class="quantity-controls">
+              <button onclick="changeQty(${idx},-1)">-</button>
+              <span>${i.qty}</span>
+              <button onclick="changeQty(${idx},1)">+</button>
+            </div>
+            <button class="rm-btn" onclick="removeItem(${idx})">Eliminar</button>
+          </div>`;
+        cItems.appendChild(div);
+      });
+      document.getElementById('totalPrice').textContent = `S/ ${total.toFixed(2)}`;
+      notif.textContent = cnt; notif.style.display = cnt?'flex':'none';
+    }
+    window.changeQty = (i,d) => { cart[i].qty+=d; if(cart[i].qty<1) cart.splice(i,1); saveCart(); };
+    window.removeItem = i => { cart.splice(i,1); saveCart(); };
 
-        let products = [];
-        let cart = JSON.parse(localStorage.getItem('cart')) || [];
+    // Modals
+    function toggleCart(){ document.getElementById('cartModal').classList.toggle('show'); }
+    function toggleYape(){ document.getElementById('yapeModal').classList.toggle('show'); }
+    window.toggleCart = toggleCart;
+    window.toggleYape = toggleYape;
 
-        async function loadCatalog() {
-            const catalogContainer = document.getElementById('catalogContainer');
-            catalogContainer.innerHTML = '';
+    // Pedir por WhatsApp
+    window.sendOrder = () => {
+      if(!cart.length) return alert('Carrito vacío');
+      let msg = 'Hola, quiero pedir:\n';
+      cart.forEach(i=> msg+=`- ${i.name} x${i.qty}\n`);
+      msg+=`\nTotal: ${document.getElementById('totalPrice').textContent}`;
+      window.open(`https://api.whatsapp.com/send?phone=51917342838&text=${encodeURIComponent(msg)}`,'_blank');
+    };
 
-            try {
-                const querySnapshot = await getDocs(collection(firestore, 'photos'));
+    // Compartir producto
+    function shareProduct(p){
+      const base = `${location.origin}${location.pathname}`;
+      const url = `${base}?productId=${p.id}`;
+      const msg = `Mira: ${p.name} - S/ ${p.price}\n${url}`;
+      window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(msg)}`,'_blank');
+    }
 
-                products = querySnapshot.docs.map(doc => ({
-                    id: doc.id,
-                    ...doc.data()
-                }));
-
-                const urlParams = new URLSearchParams(window.location.search);
-                const sharedProductId = urlParams.get('productId');
-                if (sharedProductId) {
-                    const sharedProduct = products.find(product => product.id === sharedProductId);
-                    if (sharedProduct) {
-                        renderCatalog([sharedProduct]);
-                    } else {
-                        catalogContainer.innerHTML = '<p>Producto no encontrado.</p>';
-                    }
-                } else {
-                    renderCatalog(products);
-                }
-            } catch (error) {
-                console.error("Error al cargar el catálogo:", error);
-                alert("Error al cargar el catálogo. Inténtalo más tarde.");
-            }
-        }
-
-        function renderCatalog(filteredProducts) {
-            const catalogContainer = document.getElementById('catalogContainer');
-            catalogContainer.innerHTML = '';
-
-            filteredProducts.forEach((product) => {
-                const item = document.createElement('div');
-                item.className = 'catalog-item';
-
-                const productIdEscaped = encodeURIComponent(product.id);
-                const productNameEscaped = encodeURIComponent(product.name);
-                const productPriceEscaped = encodeURIComponent(product.price);
-                const productImageUrlEscaped = encodeURIComponent(product.imageUrl);
-
-                item.innerHTML = `
-                    <img src="${product.imageUrl}" alt="${product.name}" class="catalog-image">
-                    <div class="catalog-details">
-                        <h3>${product.name}</h3>
-                        <p>Precio: S/ ${product.price}</p>
-                        <button class="add-to-cart-btn" id="add-to-cart-${product.id}" onclick="window.addToCart('${productIdEscaped}', '${productNameEscaped}', ${product.price}, '${productImageUrlEscaped}', this)">Agregar al Carrito</button>
-                        <button class="share-btn" onclick="window.shareProduct('${productIdEscaped}', '${productNameEscaped}', ${product.price}, '${productImageUrlEscaped}')">Compartir <i class="fas fa-share-alt"></i></button>
-                    </div>
-                `;
-
-                catalogContainer.appendChild(item);
-            });
-        }
-
-        function handleSearch() {
-            const searchInput = document.getElementById('searchInput').value.toLowerCase();
-            const filteredProducts = products.filter(product =>
-                product.name.toLowerCase().includes(searchInput) ||
-                product.price.toString().includes(searchInput)
-            );
-            renderCatalog(filteredProducts);
-        }
-
-        function addToCart(productId, name, price, imageUrl, button) {
-            const decodedName = decodeURIComponent(name);
-            const decodedImageUrl = decodeURIComponent(imageUrl);
-
-            const existingProduct = cart.find(item => item.id === productId);
-            if (existingProduct) {
-                existingProduct.quantity += 1;
-            } else {
-                cart.push({ id: productId, name: decodedName, price, imageUrl: decodedImageUrl, quantity: 1 });
-            }
-
-            button.style.backgroundColor = 'red';
-            button.textContent = 'Agregado';
-            button.disabled = true;
-
-            setTimeout(() => {
-                button.style.backgroundColor = '#25D366';
-                button.textContent = 'Agregar al Carrito';
-                button.disabled = false;
-            }, 2000);
-
-            updateCart();
-        }
-
-        function updateCart() {
-            const cartItemsContainer = document.getElementById('cartItems');
-            const totalPriceElement = document.getElementById('totalPrice');
-            const cartButtonNotification = document.getElementById('cartButtonNotification');
-
-            cartItemsContainer.innerHTML = '';
-            let total = 0;
-            let totalQuantity = cart.reduce((acc, item) => acc + item.quantity, 0);
-
-            cart.forEach((item, index) => {
-                let pricePerUnit = item.price;
-                if (totalQuantity >= 2) {
-                    pricePerUnit *= 0.90;
-                }
-                const itemTotal = pricePerUnit * item.quantity;
-                total += itemTotal;
-
-                const cartItem = document.createElement('div');
-                cartItem.className = 'cart-item';
-                cartItem.innerHTML = `
-                    <img src="${item.imageUrl}" alt="${item.name}" class="cart-image">
-                    <div class="cart-details">
-                        <h4>${item.name}</h4>
-                        <p>Precio: S/ ${pricePerUnit.toFixed(2)}</p>
-                        <div class="quantity-controls">
-                            <button class="quantity-btn" onclick="window.changeQuantity(${index}, -1)">-</button>
-                            <span>${item.quantity}</span>
-                            <button class="quantity-btn" onclick="window.changeQuantity(${index}, 1)">+</button>
-                        </div>
-                        <button class="remove-btn" onclick="window.removeFromCart(${index})">Eliminar</button>
-                    </div>
-                `;
-                cartItemsContainer.appendChild(cartItem);
-            });
-
-            totalPriceElement.textContent = `Total: S/ ${total.toFixed(2)}`;
-            cartButtonNotification.textContent = totalQuantity;
-            cartButtonNotification.style.display = totalQuantity > 0 ? 'flex' : 'none';
-
-            // Guardar el carrito en localStorage
-            localStorage.setItem('cart', JSON.stringify(cart));
-        }
-
-        function changeQuantity(index, amount) {
-            const product = cart[index];
-            product.quantity += amount;
-            if (product.quantity <= 0) {
-                removeFromCart(index);
-            } else {
-                updateCart();
-            }
-        }
-
-        function removeFromCart(index) {
-            cart.splice(index, 1);
-            updateCart();
-        }
-
-        function toggleCartModal() {
-            const cartModal = document.getElementById('cartModal');
-            cartModal.classList.toggle('show');
-        }
-
-        function toggleYapeModal() {
-            const yapeModal = document.getElementById('yapeModal');
-            yapeModal.classList.toggle('show');
-        }
-
-        function sendOrderViaWhatsApp() {
-            if (cart.length === 0) {
-                alert("El carrito está vacío.");
-                return;
-            }
-
-            let message = "Hola, me gustaría hacer el siguiente pedido:\n";
-            cart.forEach((item) => {
-                message += `\n- ${item.name} (Cantidad: ${item.quantity})`;
-            });
-            const totalPrice = document.getElementById('totalPrice').textContent;
-            message += `\n\n${totalPrice}`;
-
-            // Incluir imágenes en el mensaje
-          
-
-            const whatsappUrl = `https://api.whatsapp.com/send?phone=51917342838&text=${encodeURIComponent(message)}`;
-            window.open(whatsappUrl, '_blank');
-        }
-
-        function shareProduct(productId, name, price, imageUrl) {
-            const productUrl = `https://ivanclas.github.io/Catalogo-Streaming/index.html?productId=${productId}`;
-            const message = `¡Mira este producto! 🛍️\n\nProducto: ${decodeURIComponent(name)}\nPrecio: S/ ${price}\n\nPuedes verlo aquí: ${productUrl}`;
-            const whatsappUrl = `https://api.whatsapp.com/send?text=${encodeURIComponent(message)}`;
-            window.open(whatsappUrl, '_blank');
-        }
-
-        // Cerrar el modal al hacer clic fuera del contenido del modal
-        window.addEventListener('click', function(event) {
-            const yapeModal = document.getElementById('yapeModal');
-            const cartModal = document.getElementById('cartModal');
-            if (event.target === yapeModal) {
-                yapeModal.classList.remove('show');
-            }
-            if (event.target === cartModal) {
-                cartModal.classList.remove('show');
-            }
-        });
-
-        window.addToCart = addToCart;
-        window.changeQuantity = changeQuantity;
-        window.removeFromCart = removeFromCart;
-        window.toggleCartModal = toggleCartModal;
-        window.toggleYapeModal = toggleYapeModal;
-        window.sendOrderViaWhatsApp = sendOrderViaWhatsApp;
-        window.shareProduct = shareProduct;
-        window.handleSearch = handleSearch;
-
-        window.addEventListener('load', () => {
-            cart = JSON.parse(localStorage.getItem('cart')) || [];
-            updateCart();
-            loadCatalog();
-            document.getElementById('searchInput').addEventListener('input', handleSearch);
-        });
-    </script>
+    // Initialize
+    loadCatalog();
+    loadCart();
+  </script>
 </body>
 </html>
