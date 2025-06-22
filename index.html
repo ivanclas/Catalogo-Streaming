@@ -27,6 +27,7 @@
     }
     .auth-btn i { font-size:1.2rem; color:#DB4437 }
     .auth-btn:hover { background:#f0f0f0; }
+
     #searchContainer { flex:1; min-width:160px; }
     #searchInput {
       width:100%; padding:.6rem 1rem;
@@ -34,9 +35,18 @@
       font-size:1rem;
       box-shadow: inset 0 1px 3px rgba(0,0,0,0.1);
     }
+
     .header h1 {
       flex:none; font-size:1.5rem; color:#4CAF50; font-weight:600;
       margin:0 auto;
+    }
+
+    .user-name {
+      flex-basis:100%;
+      text-align:center;
+      font-size:.9rem;
+      color:#555;
+      margin-top:.5rem;
     }
 
     /* ===== Catálogo ===== */
@@ -80,7 +90,6 @@
       box-shadow:0 4px 10px rgba(0,0,0,0.2); cursor:pointer;
       transition:transform .2s; z-index:100;
     }
-    /* ahora el carrito queda abajo */
     #cartButton     { bottom:1rem; background:#4CAF50; }
     #yapeButton     { bottom:6rem; background:#1A73E8; }
     #whatsappButton { bottom:11rem; background:#128C7E; }
@@ -111,7 +120,7 @@
     }
     .modal-header { margin-bottom:.5rem; }
 
-    /* ==== Carrito estilo tarjeta + scroll ==== */
+    /* ==== Carrito tarjeta + scroll ==== */
     .cart-list {
       flex:1; overflow-y:auto; max-height:260px;
       display:flex; flex-direction:column; gap:1rem;
@@ -189,6 +198,7 @@
     <div id="searchContainer">
       <input type="text" id="searchInput" placeholder="Buscar nombre o precio…"/>
     </div>
+    <div id="userName" class="user-name"></div>
   </header>
 
   <div id="catalogContainer"></div>
@@ -236,7 +246,8 @@
     import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
     import {
       getAuth, GoogleAuthProvider,
-      signInWithPopup, onAuthStateChanged
+      signInWithPopup, signOut,
+      onAuthStateChanged
     } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-auth.js";
 
     // Firebase config
@@ -258,18 +269,30 @@
     // UI elements
     const btnG     = document.getElementById('btnGoogle'),
           authText = document.getElementById('authText'),
+          userName = document.getElementById('userName'),
           notif    = document.getElementById('cartNotif'),
           catC     = document.getElementById('catalogContainer'),
           cItems   = document.getElementById('cartItems');
 
-    // Google Sign-In
-    btnG.onclick = () => signInWithPopup(auth, provider);
+    // Google Sign-In / Sign-Out
+    btnG.onclick = async () => {
+      if (auth.currentUser) {
+        await signOut(auth);
+      } else {
+        try {
+          await signInWithPopup(auth, provider);
+        } catch (e) {
+          console.error("Error en signIn:", e);
+        }
+      }
+    };
     onAuthStateChanged(auth, user => {
       authText.textContent = user ? 'Cerrar sesión' : 'Iniciar con Google';
+      userName.textContent = user ? `Hola, ${user.displayName}` : '';
       loadCart();
     });
 
-    // Load catalog
+    // Carga catálogo
     async function loadCatalog() {
       catC.innerHTML = '';
       try {
@@ -321,7 +344,7 @@
       ));
     };
 
-    // Cart logic: per-user or guest
+    // Lógica de carrito (por usuario o invitado)
     const cartKey = () => 'cart_' + (auth.currentUser?.uid||'guest');
     function loadCart(){
       cart = JSON.parse(localStorage.getItem(cartKey()))||[];
@@ -364,7 +387,7 @@
     window.changeQty = (i,d) => { cart[i].qty+=d; if(cart[i].qty<1) cart.splice(i,1); saveCart(); };
     window.removeItem = i => { cart.splice(i,1); saveCart(); };
 
-    // Modals
+    // Modales
     function toggleCart(){ document.getElementById('cartModal').classList.toggle('show'); }
     function toggleYape(){ document.getElementById('yapeModal').classList.toggle('show'); }
     window.toggleCart = toggleCart;
