@@ -6,7 +6,7 @@
   <title>Catálogo Streaming</title>
   <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet"/>
   <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0-beta3/css/all.min.css"/>
-  <style>
+ <style>
     /* ===== Reset & Base ===== */
     *, *::before, *::after { box-sizing:border-box; margin:0; padding:0; }
     html { font-size: 16px; }
@@ -15,7 +15,8 @@
       background:#f4f6f9;
       color:#333;
       line-height:1.4;
-      padding-top: 10rem; /* separa siempre del header */
+      /* Acolchonamiento para separar siempre del header fijo */
+      padding-top: 12rem;
     }
 
     /* ===== Header ===== */
@@ -123,7 +124,7 @@
     }
     .modal-header { margin-bottom:.5rem; }
 
-    /* ==== Carrito estilo tarjeta + scroll ==== */
+    /* ==== Carrito tarjeta + scroll ==== */
     .cart-list {
       flex:1; overflow-y:auto; max-height:260px;
       display:flex; flex-direction:column; gap:1rem;
