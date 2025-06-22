@@ -15,8 +15,7 @@
       background:#f4f6f9;
       color:#333;
       line-height:1.4;
-      /* Acolchonamiento para separar siempre del header */
-      padding-top: 10rem;
+      padding-top: 10rem; /* separa siempre del header */
     }
 
     /* ===== Header ===== */
@@ -55,7 +54,6 @@
 
     /* ===== Catálogo ===== */
     #catalogContainer {
-      /* margin-top eliminado, ahora el body maneja el espacio */
       padding:1rem 5%;
       display:grid; gap:1rem;
       grid-template-columns:repeat(auto-fit,minmax(200px,1fr));
@@ -185,7 +183,7 @@
       .header{flex-direction:column;align-items:flex-start;}
       .header h1{width:100%;text-align:center;font-size:1.25rem;}
       #searchContainer,.auth-btn{width:100%;}
-      #catalogContainer{grid-template-columns:1fr;margin-top:9rem;}
+      #catalogContainer{grid-template-columns:1fr;}
       .fabtn{width:3rem;height:3rem;font-size:1rem;}
       .modal-content{width:95%;padding:.75rem;}
       .yape-qr{width:90%;}
@@ -248,7 +246,8 @@
 
   <script type="module">
     import { initializeApp } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-app.js";
-    import { getFirestore, collection, getDocs } from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
+    import { getFirestore, collection, getDocs, doc, getDoc, setDoc }
+      from "https://www.gstatic.com/firebasejs/9.6.10/firebase-firestore.js";
     import {
       getAuth, GoogleAuthProvider,
       signInWithPopup, signOut,
@@ -279,7 +278,7 @@
           catC     = document.getElementById('catalogContainer'),
           cItems   = document.getElementById('cartItems');
 
-    // Google Sign-In / Sign-Out
+    // Sign-in / Sign-out
     btnG.onclick = async () => {
       if (auth.currentUser) {
         await signOut(auth);
@@ -291,13 +290,13 @@
         }
       }
     };
-    onAuthStateChanged(auth, user => {
+    onAuthStateChanged(auth, async user => {
       authText.textContent = user ? 'Cerrar sesión' : 'Iniciar con Google';
       userName.textContent = user ? `Hola, ${user.displayName}` : '';
-      loadCart();
+      await loadCart();
     });
 
-    // Carga catálogo
+    // Load catalog
     async function loadCatalog() {
       catC.innerHTML = '';
       try {
@@ -312,6 +311,7 @@
           Error al cargar catálogo.</p>`;
       }
     }
+
     function renderCatalog(list) {
       catC.innerHTML = '';
       list.forEach(p => {
@@ -341,6 +341,7 @@
         d.querySelector('.share-btn').onclick = ()=>shareProduct(p);
       });
     }
+
     document.getElementById('searchInput').oninput = e => {
       const term = e.target.value.toLowerCase();
       renderCatalog(products.filter(p=>
@@ -349,21 +350,39 @@
       ));
     };
 
-    // Lógica de carrito (por usuario o invitado)
-    const cartKey = () => 'cart_' + (auth.currentUser?.uid||'guest');
-    function loadCart(){
-      cart = JSON.parse(localStorage.getItem(cartKey()))||[];
+    // Cart persistence key
+    const cartKey = () => auth.currentUser
+      ? `cart_${auth.currentUser.uid}` : 'cart_guest';
+
+    // Load cart (Firestore or localStorage)
+    async function loadCart(){
+      if (auth.currentUser) {
+        const ref = doc(db,'carts', auth.currentUser.uid);
+        const snap = await getDoc(ref);
+        cart = snap.exists() ? snap.data().items : [];
+      } else {
+        cart = JSON.parse(localStorage.getItem(cartKey()))||[];
+      }
       updateCartUI();
     }
-    function saveCart(){
-      localStorage.setItem(cartKey(), JSON.stringify(cart));
+
+    // Save cart (Firestore or localStorage)
+    async function saveCart(){
+      if (auth.currentUser) {
+        const ref = doc(db,'carts', auth.currentUser.uid);
+        await setDoc(ref,{ items: cart });
+      } else {
+        localStorage.setItem(cartKey(), JSON.stringify(cart));
+      }
       updateCartUI();
     }
+
     function addToCart(p){
       const ex = cart.find(x=>x.id===p.id);
       ex ? ex.qty++ : cart.push({...p, qty:1});
       saveCart();
     }
+
     function updateCartUI(){
       cItems.innerHTML = ''; let total=0, cnt=0;
       cart.forEach((i,idx)=>{
@@ -392,7 +411,7 @@
     window.changeQty = (i,d) => { cart[i].qty+=d; if(cart[i].qty<1) cart.splice(i,1); saveCart(); };
     window.removeItem = i => { cart.splice(i,1); saveCart(); };
 
-    // Modales
+    // Modals
     function toggleCart(){ document.getElementById('cartModal').classList.toggle('show'); }
     function toggleYape(){ document.getElementById('yapeModal').classList.toggle('show'); }
     window.toggleCart = toggleCart;
